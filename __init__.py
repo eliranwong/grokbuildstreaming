@@ -14,7 +14,7 @@ from grokbuildstreaming.stream import (
     subscription_env,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.1.3"
 
 __all__ = [
     "DEFAULT_MODEL",

@@ -19,9 +19,12 @@ class FormatPromptTests(unittest.TestCase):
             [{"role": "system", "content": "You are BibleMate AI."}],
             follow_up="List two tools.",
         )
-        self.assertEqual(prompt, "List two tools.")
-        self.assertIn("You are BibleMate AI.", system)
+        self.assertIn("You are BibleMate AI.", prompt)
+        self.assertTrue(prompt.endswith("List two tools."))
+        self.assertNotIn("You are BibleMate AI.", system)
         self.assertNotIn("List two tools.", system)
+        self.assertNotIn("Reply with the answer text only.", system)
+        self.assertIn("Obey the system prompt.", system)
         self.assertNotIn("User:", prompt)
 
     def test_history_keeps_the_latest_request_intact(self):
@@ -34,11 +37,12 @@ class FormatPromptTests(unittest.TestCase):
             follow_up="Second question",
             system="Extra role",
         )
+        self.assertIn("Role.", prompt)
         self.assertIn("User:\nFirst question", prompt)
         self.assertIn("Assistant:\nFirst answer", prompt)
         self.assertTrue(prompt.endswith("User:\nSecond question"))
         self.assertIn("Extra role", system)
-        self.assertIn("Role.", system)
+        self.assertNotIn("Role.", system)
         self.assertNotIn("Second question", system)
 
     def test_content_blocks_join_text(self):

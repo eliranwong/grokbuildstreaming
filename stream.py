@@ -22,9 +22,11 @@ STREAM_LIMIT = 8 * 1024 * 1024
 # A per-model api_key in ~/.grok/config.toml still outranks the login session.
 # These variables are the environment fallback and are removed on purpose.
 _API_KEY_ENV = ("XAI_API_KEY", "XAI_API_KEY_FILE")
+# The system prompt owns the task. The user message is the input to that task.
 _TEXT_ONLY_RULE = (
-    "Reply with the answer text only. "
-    "Do not call tools, read or edit files, browse the web, or run commands."
+    "Do not call tools, read or edit files, browse the web, or run commands. "
+    "Obey the system prompt. The user message is the input to that task. "
+    "When the system prompt asks for a specification or a formatted block instead of a direct answer, produce only that specification."
 )
 # Internal tool ids. Both shell names appear across CLI versions.
 _DISALLOWED_TOOLS = ",".join((
@@ -114,12 +116,14 @@ def format_prompt(
     """Split chat messages into a user prompt and a system prompt.
 
     A lone user turn is left unlabeled so the model sees that text exactly.
-    Earlier turns are labeled when history is present. System messages are
-    not copied into the user prompt.
+    Earlier turns are labeled when history is present. The explicit ``system``
+    argument is the system prompt. System messages already in ``messages`` stay
+    in the user prompt, so a generic identity does not outrank the task.
     """
     system_parts: list[str] = []
     if isinstance(system, str) and system.strip():
         system_parts.append(system.strip())
+    standing: list[str] = []
     turns: list[tuple[str, str]] = []
     for message in messages or ():
         role = str(message.get("role") or "user").strip().lower()
@@ -127,7 +131,7 @@ def format_prompt(
         if not content:
             continue
         if role == "system":
-            system_parts.append(content)
+            standing.append(content)
         elif role == "assistant":
             turns.append(("Assistant", content))
         else:
@@ -135,12 +139,15 @@ def format_prompt(
     if isinstance(follow_up, str) and follow_up.strip():
         turns.append(("User", follow_up.strip()))
     system_parts.append(_TEXT_ONLY_RULE)
-    if not turns:
+    if not turns and not standing:
         raise GrokBuildError("No prompt to send.")
     if len(turns) == 1 and turns[0][0] == "User":
         prompt = turns[0][1]
     else:
         prompt = "\n\n".join(f"{role}:\n{content}" for role, content in turns)
+    if standing:
+        context = "\n\n".join(standing)
+        prompt = f"{context}\n\n{prompt}" if prompt else context
     return prompt, "\n\n".join(system_parts)
 
 

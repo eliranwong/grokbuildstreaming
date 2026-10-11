@@ -30,7 +30,7 @@ async def main():
 asyncio.run(main())
 ```
 
-`messages` use `role` and `content`, the same shape agentmake accepts. `follow_up` is the newest user turn. System text is sent with `--system-prompt-override`. Each call is a new headless process: the library does not resume a previous Grok session.
+`messages` use `role` and `content`, the same shape agentmake accepts. `follow_up` is the newest user turn. An explicit `system` argument is sent with `--system-prompt-override`. System messages already in `messages` stay in the user prompt, so a generic identity does not outrank that task. Each call is a new headless process: the library does not resume a previous Grok session.
 
 The process is text-only. It runs with `--max-turns 1`, plan mode off, web search off, subagents off, and built-in tools removed, in a temporary working directory. Cancel an in-flight stream by setting the `asyncio.Event` passed as `cancel_event`.
 
