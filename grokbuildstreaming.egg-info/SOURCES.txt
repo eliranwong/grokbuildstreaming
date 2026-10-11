@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+./__init__.py
+./stream.py
+grokbuildstreaming.egg-info/PKG-INFO
+grokbuildstreaming.egg-info/SOURCES.txt
+grokbuildstreaming.egg-info/dependency_links.txt
+grokbuildstreaming.egg-info/top_level.txt
+tests/test_stream.py
