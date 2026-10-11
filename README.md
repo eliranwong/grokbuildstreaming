@@ -7,10 +7,10 @@ Authentication is the subscription session from `grok login` (`~/.grok/auth.json
 ## Install
 
 ```bash
-pip install -e /path/to/grokbuildstreaming
+pip install grokbuildstreaming
 ```
 
-Requires the `grok` executable on `PATH` or at `~/.grok/bin/grok`, and a completed `grok login`.
+Published on [PyPI](https://pypi.org/project/grokbuildstreaming/). Requires the `grok` executable on `PATH` or at `~/.grok/bin/grok`, and a completed `grok login`.
 
 ## Stream
 
